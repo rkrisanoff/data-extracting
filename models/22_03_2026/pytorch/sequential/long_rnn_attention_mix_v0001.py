@@ -1,0 +1,34 @@
+import torch
+import torch.nn as nn
+
+
+class Model(nn.Module):
+    INPUT_SHAPE = (1, 32, 32)
+    DYNAMIC_AXES = {0: 'batch_size', 1: 'sequence_length'}
+    STATIC_AXES = {2: 'embedding_dim'}
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.rnn_0 = nn.RNN(batch_first=True, input_size=32, hidden_size=128)
+        self.multiheadattention_0 = nn.MultiheadAttention(batch_first=True, embed_dim=128, num_heads=2)
+        self.multiheadattention_1 = nn.MultiheadAttention(batch_first=True, embed_dim=128, num_heads=2)
+        self.layernorm_0 = nn.LayerNorm(normalized_shape=[128])
+        self.linear_0 = nn.Linear(in_features=128, out_features=256)
+        self.relu_0 = nn.ReLU()
+        self.linear_1 = nn.Linear(in_features=256, out_features=128)
+        self.sigmoid_0 = nn.Sigmoid()
+        self.layernorm_1 = nn.LayerNorm(normalized_shape=[128])
+        self.softmax_0 = nn.Softmax(dim=-1)
+
+    def forward(self, tensor: torch.Tensor) -> torch.Tensor:
+        x0, _ = self.rnn_0(tensor)
+        x1, _ = self.multiheadattention_0(x0, x0, x0)
+        x2, _ = self.multiheadattention_1(x1, x1, x1)
+        x3 = self.layernorm_0(x2)
+        x4 = self.linear_0(x3)
+        x5 = self.relu_0(x4)
+        x6 = self.linear_1(x5)
+        x7 = self.sigmoid_0(x6)
+        x8 = self.layernorm_1(x7)
+        x9 = self.softmax_0(x8)
+        return x9
